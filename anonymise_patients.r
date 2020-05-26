@@ -12,7 +12,7 @@
 ##
 ## ---------------------------
 ##
-## Notes: 
+## Notes: Load in data. Select columns to anoynomize and run code in the main section
 ##
 ## ---------------------------
 
@@ -38,11 +38,7 @@ library(readr)
 
 #' Anonymize a vector.
 #'
-#' \code{anonymize} anonymizes a vector \code{.x} by first salting it with
-#'  \code{\link{salt}} and then hashing it with \code{\link{hash}}. See
-#'  both functions for additional documentation.
-#'
-#' The user is advised to check out \href{https://en.wikipedia.org/wiki/Data_anonymization}{Wikipedia} for more information.
+#' anonymizes a vector by first salting it with and then hashing it with hash. 
 #'
 #' @param .x a vector.
 #' @param .algo the name of the algorithm.
@@ -64,8 +60,6 @@ anonymize <- function(.x, .algo = "crc32", .seed = 123,
 
 #' Hash a vector.
 #'
-#' The user is advised to check out \href{https://en.wikipedia.org/wiki/Hash_function}{Wikipedia} for more information.
-#'
 #' @param .x a vector.
 #' @param .algo the name of the algorithm.
 #' @param .seed an integer to seed the random number generator.
@@ -85,14 +79,9 @@ hash <- function(.x, .algo = "sha256", .seed = 0, ...){
 
 #' Salt a vector.
 #'
-#' \code{salt} takes a vector \code{.x} and returns a salted version of it.
-#' The algorithm for salting a vector is:
-#' \enumerate{
-#'   \item Select a random sample of characters of length \code{.n_chars} from \code{.chars}. Call this random sample \code{.y}.
-#'   \item Concatenate \code{.y}, the vector \code{.x}, and \code{.y} again in a vectorized fashion.
-#' }
-#'
-#' The user is advised to check out \href{https://en.wikipedia.org/wiki/Salt_\%28cryptography\%29}{Wikipedia} for more information.
+#' takes a vector and returns a salted version of it. The algorithm for salting a vector is:
+#' Select a random sample of characters of length .n_chars from \.chars. Call this random sample .y.
+#' Concatenate .y, the vector .x, and .y again in a vectorized fashion.
 #'
 #' @param .x a vector.
 #' @param .seed an integer to seed the random number generator.
@@ -112,21 +101,42 @@ salt <- function(.x, .seed = NULL, .chars = letters, .n_chars = 5L) {
 ################################################################################
 
 ##########
-##########                       Main Work Flow 
+##########                       Example Work Flow 
 ##########
 
 ################################################################################
 
 # ------------------------------------------------------------------------------
 
+# Load in data in desried format. Long / wide should not matter as the anoynmize
+# functions will always map the same input to the same output.
 
-#
+
+
+# Example
+string_example = "First-name Last-name"
+
+# Example String
+print(string_example)
+
+# Run it through function once
+print(anonymize(string_example))
+
+# Same string running through function maps to same output
+print(anonymize(string_example))
+
+
+
+
+# Load in data
 patient_data <- read_csv("patient_data.csv")
 
-# choose columns to mask
-cols_to_mask <- c("full_name","gender","ethnicity")
+# Choose columns to anoynomize
+cols_to_mask <- c("full_name","ethnicity") # <-------- Replace columns to match your data
 col_index = which(colnames(patient_data) %in% cols_to_mask)
+
 # backup original data
 patient_data_org <- patient_data
-# anonymize
+
+# Anonymize each specified column
 patient_data[col_index] <- lapply(patient_data[col_index], anonymize)
